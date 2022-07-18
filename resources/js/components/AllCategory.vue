@@ -1,29 +1,15 @@
 <template>
     <div>
         <h2 class="text-center">Category List</h2>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Detail</th>
-                </tr>
-            </thead>
 
-            <tbody>
-                <tr v-for="category in categories">
-                    <td>{{ category.id }}</td>
-                    <td>{{ category.name }}</td>
-                    <td>{{ category.description }}</td>
-                    <td>
-                        <div class="btn-group" role="group">
-                            <router-link :to="{ name: 'edit', params: { id: category.id } }" class="btn btn-primary">Edit</router-link>
-                            <button class="btn btn-danger" @click="deleteCategory(category.id)">Delete</button>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <b-input-group class="mt-3 mb-3" size="sm">
+            <b-form-input v-model="keyword" placeholder="Search" type="text"></b-form-input>
+            <b-input-group-text slot="append">
+                <b-btn class="p-0" :disabled="!keyword" variant="link" size="sm" @click="keyword = ''"><i class="fa fa-remove"></i></b-btn>
+            </b-input-group-text>
+        </b-input-group>
+
+        <b-table :fields="fields" :items="items" :keyword="keyword"></b-table>
     </div>
 </template>
 
@@ -31,31 +17,35 @@
 export default {
     data() {
         return {
-            categories: []
+            keyword: "",
+            dataArray: this.getCategories(),
+            fields: [
+                { key: "name", label: "Name", sortable: true },
+                { key: "description", label: "Description", sortable: false },
+                { key: "action", label: "", sortable: false }
+            ]
         };
-    },
-    created() {
-        this.getCategories();
     },
     methods: {
         getCategories() {
             axios.get("http://api.localhost/categories")
                 .then(response => {
-                    this.categories = response.data;
+                    this.dataArray = response.data;
                 })
                 .catch(error => {
                     console.log(error);
                 });
-        },
-        deleteCategory(id) {
-            axios.delete("http://api.localhost/categories/" + id)
-                .then(response => {
-                    let i = this.categories.map(data => data.id).indexOf(id);
-                    this.categories.splice(i, 1);
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+        }
+    },
+    computed: {
+        items() {
+            return this.keyword
+                ? this.dataArray.filter(
+                    (item) =>
+                        item.name.includes(this.keyword) ||
+                        item.description.includes(this.keyword)
+                )
+                : this.dataArray;
         }
     }
 }

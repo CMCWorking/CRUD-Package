@@ -25,10 +25,6 @@ class CategoryAPIRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'image' => 'required|string',
-            'status' => 'required|integer',
-            'slug' => 'unique:categories',
-            'parent_id' => 'integer',
         ];
     }
 
@@ -36,10 +32,6 @@ class CategoryAPIRequest extends FormRequest
     {
         return [
             'name.required' => 'The name field is required.',
-            'image.required' => 'The image field is required.',
-            'status.required' => 'The status field is required.',
-            'slug.unique' => 'The slug has already been taken.',
-            'parent_id.integer' => 'The parent id must be an integer.',
         ];
     }
 }

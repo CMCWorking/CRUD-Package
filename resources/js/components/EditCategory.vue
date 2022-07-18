@@ -7,7 +7,7 @@
                 <form @submit.prevent="updateCategory">
                     <div class="form-group">
                         <label for="name">Name</label>
-                        <input type="text" name="name" id="name" v-model="category.name">
+                        <input type="text" name="name" id="name" class="form-control" v-model="category.name">
                     </div>
 
                     <div class="form-group">

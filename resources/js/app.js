@@ -15,6 +15,10 @@ import axios from 'axios';
 import {
     routes
 } from './routes';
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
+
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 /**
  * The following block of code may be used to automatically register your
@@ -38,6 +42,8 @@ Vue.component('modal', require('./components/DeleteModal.vue'));
 
 Vue.use(VueRouter);
 Vue.use(VueAxios, axios);
+Vue.use(BootstrapVue);
+Vue.use(IconsPlugin);
 
 const router = new VueRouter({
     mode: 'history',
