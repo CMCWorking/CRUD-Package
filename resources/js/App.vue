@@ -4,8 +4,7 @@
             <div class="collapse navbar-collapse">
                 <div class="navbar-nav">
                     <router-link to="/" class="nav-item nav-link">Home</router-link>
-                    <router-link :to="{name: 'create'}" class="nav-item nav-link">Add new Category</router-link>
-
+                    <router-link :to="{ name: 'create' }" class="nav-item nav-link">Add new Category</router-link>
                 </div>
             </div>
         </nav>
@@ -15,5 +14,5 @@
 </template>
 
 <script>
-    export default {}
+export default {}
 </script>
