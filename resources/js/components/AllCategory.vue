@@ -6,7 +6,21 @@
             <b-form-input v-model="keyword" placeholder="Search" type="text"></b-form-input>
         </b-input-group>
 
-        <b-table :fields="fields" :items="items" :keyword="keyword"></b-table>
+        <b-table :fields="fields" :items="categories" :keyword="keyword">
+            <template #cell(action)="data">
+                <router-link :to="{ name: 'edit', params: { id: data.item.id } }" class="btn btn-primary w-100">Edit</router-link>
+                <button class="btn btn-danger w-100" @click="showModal(data.item.id)">Delete</button>
+            </template>
+        </b-table>
+
+        <b-modal ref="my-modal" title="Delete this category" id="bv-modal-example" hide-footer>
+            <template #modal-title>
+                Are you sure to delete this Category?. <br>
+                This action can not undone
+            </template>
+            <b-button class="mt-2" variant="btn-primary" block @click="hideModal">Close</b-button>
+            <b-button class="mt-2" variant="outline-danger" block @click="deleteCategory(delete_id)">Confirm Delete</b-button>
+        </b-modal>
     </div>
 </template>
 
@@ -32,10 +46,29 @@ export default {
                 .catch(error => {
                     console.log(error);
                 });
+        },
+        deleteCategory(id) {
+            // console.log(id);
+            axios.delete("http://api.localhost/categories/" + id)
+                .then(response => {
+                    let i = this.dataArray.map(data => data.id).indexOf(id);
+                    this.dataArray.splice(i, 1);
+                    this.hideModal();
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        },
+        showModal(id) {
+            this.delete_id = id;
+            this.$refs['my-modal'].show()
+        },
+        hideModal() {
+            this.$refs['my-modal'].hide()
         }
     },
     computed: {
-        items() {
+        categories() {
             return this.keyword
                 ? this.dataArray.filter(
                     (item) =>
