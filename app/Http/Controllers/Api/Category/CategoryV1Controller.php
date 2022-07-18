@@ -28,7 +28,7 @@ class CategoryV1Controller extends Controller
      */
     public function index(Request $request)
     {
-        $categories = $this->category->filter($request->all())->get();
+        $categories = $this->category->orderBy('created_at', 'desc')->filter($request->all())->get();
         return response()->json($categories);
     }
 
