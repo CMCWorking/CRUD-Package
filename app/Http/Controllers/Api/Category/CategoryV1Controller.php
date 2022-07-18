@@ -9,7 +9,6 @@ use App\Transformer\CategoryTransformer;
 use Dingo\Api\Routing\Helpers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class CategoryV1Controller extends Controller
 {
@@ -29,9 +28,8 @@ class CategoryV1Controller extends Controller
      */
     public function index(Request $request)
     {
-        $categories = $this->category->filter($request->all())->paginate($request->paginate ?? $this->page);
-
-        return $this->response->paginator($categories, new CategoryTransformer());
+        $categories = $this->category->all()->toArray();
+        return array_reverse($categories);
     }
 
     /**
@@ -43,12 +41,14 @@ class CategoryV1Controller extends Controller
      */
     public function show($id)
     {
-        $category = $this->category->find($id);
-        if (!$category) {
-            return $this->response->errorNotFound('Category not found');
-        }
+        // $category = $this->category->find($id);
+        // if (!$category) {
+        //     return $this->response->errorNotFound('Category not found');
+        // }
 
-        return $this->response->item($category, new CategoryTransformer());
+        // return $this->response->item($category, new CategoryTransformer());
+        $category = $this->category->find($id);
+        return response()->json($category);
     }
 
     /**
@@ -58,21 +58,13 @@ class CategoryV1Controller extends Controller
      */
     public function store(CategoryAPIRequest $request)
     {
-        if (!auth()->user()->can('create-categories')) {
-            return $this->response->AccessDeniedHttpException('You are not allowed to create categories.');
-        }
-
         $category = $this->category->create([
-            'name' => $request->name,
-            'slug' => $request->slug ? $request->slug : Str::slug($request->name),
-            'description' => $request->description,
-            'image' => $request->image,
-            'parent_id' => $request->parent_id,
-            'status' => $request->status,
-            'keywords' => $request->keywords,
+            'name' => $request->input('name'),
+            'slug' => Str::slug($request->input('name')),
+            'description' => $request->input('description'),
         ]);
 
-        return $this->response->item($category, new CategoryTransformer());
+        return response()->json('Category created successfully');
     }
 
     /**
@@ -87,14 +79,6 @@ class CategoryV1Controller extends Controller
     {
         $category = $this->category->find($id);
 
-        if (!$category) {
-            return $this->response->errorNotFound('Category not found');
-        }
-
-        if (!auth()->user()->can('update-categories')) {
-            return $this->response->AccessDeniedHttpException('You are not allowed to update categories.');
-        }
-
         $category->update([
             'name' => $request->name,
             'slug' => $request->slug ? $request->slug : Str::slug($request->name),
@@ -105,9 +89,7 @@ class CategoryV1Controller extends Controller
             'keywords' => $request->keywords,
         ]);
 
-        return $this->response->array([
-            'message' => 'Category updated successfully',
-        ]);
+        return response()->json('Category updated successfully');
     }
 
     /**
@@ -121,19 +103,9 @@ class CategoryV1Controller extends Controller
     {
         $category = $this->category->find($id);
 
-        if (!$category) {
-            return $this->response->errorNotFound('Category not found');
-        }
-
-        if (!auth()->user()->can('delete-categories')) {
-            return $this->response->AccessDeniedHttpException('You are not allowed to delete categories.');
-        }
-
         $category->delete();
 
-        return $this->response->array([
-            'message' => 'Category deleted successfully',
-        ]);
+        return response()->json('Category deleted successfully');
     }
 
     public function search(Request $request)

@@ -11,7 +11,7 @@
 
                     <div class="form-group">
                         <label for="description">Description</label>
-                        <textarea name="description" id="description" cols="30" rows="10" v-model="category.description"></textarea>
+                        <textarea name="description" id="description" cols="30" rows="10" v-model="category.description" class="form-control"></textarea>
                     </div>
 
                     <button class="btn btn-primary">Create</button>
@@ -22,24 +22,24 @@
 </template>
 
 <script>
-    export default {
-        data() {
-            return {
-                category: {}
-            }
-        },
-        methods: {
-            addCategory() {
-                axios.post('api.localhost/categories', this.category)
-                    .then(response => {
-                        this.category = {};
-                        this.$router.push('/categories');
-                    })
-                    .catch(error => {
-                        console.log(error);
-                    })
-                    .finally(() => this.loadin = false);
-            }
+export default {
+    data() {
+        return {
+            category: {}
+        }
+    },
+    methods: {
+        addCategory() {
+            axios.post('http://api.localhost/categories', this.category)
+                .then(response => {
+                    this.category = {};
+                    this.$router.push('/');
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+                .finally(() => this.loading = false);
         }
     }
+}
 </script>

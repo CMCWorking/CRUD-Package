@@ -20,6 +20,10 @@
 <body>
     <div id="app"></div>
 
+    <modal v-if="showModal"
+           @close="showModal = false">
+    </modal>
+
     <script src="{{ mix('js/app.js') }}"
             type="text/javascript"></script>
 </body>
