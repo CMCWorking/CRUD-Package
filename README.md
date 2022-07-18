@@ -12,4 +12,4 @@ npm install
 npm run watch
 ```
 
-After that, go to `localhost` to check demo
+After that, go to `http://localhost` to check demo
