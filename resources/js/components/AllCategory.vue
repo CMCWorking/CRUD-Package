@@ -6,7 +6,7 @@
             <b-form-input v-model="keyword" placeholder="Search" type="text"></b-form-input>
         </b-input-group>
 
-        <b-table :fields="fields" :items="categories" :keyword="keyword">
+        <b-table :fields="fields" :items="categories" :keyword="keyword" label-sort-asc="" label-sort-desc="">
             <template #cell(action)="data">
                 <router-link :to="{ name: 'edit', params: { id: data.item.id } }" class="btn btn-primary w-100">Edit</router-link>
                 <button class="btn btn-danger w-100" @click="showModal(data.item.id)">Delete</button>
