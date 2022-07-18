@@ -4,9 +4,6 @@
 
         <b-input-group class="mt-3 mb-3" size="sm">
             <b-form-input v-model="keyword" placeholder="Search" type="text"></b-form-input>
-            <b-input-group-text slot="append">
-                <b-btn class="p-0" :disabled="!keyword" variant="link" size="sm" @click="keyword = ''"><i class="fa fa-remove"></i></b-btn>
-            </b-input-group-text>
         </b-input-group>
 
         <b-table :fields="fields" :items="items" :keyword="keyword"></b-table>
