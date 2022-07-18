@@ -6,7 +6,7 @@ services:
             context: .
             dockerfile: Dockerfile
         image: digitalocean.com/php
-        container_name: app_api
+        container_name: app_crud
         restart: unless-stopped
         tty: true
         environment:
@@ -22,7 +22,7 @@ services:
     #Nginx Service
     webserver:
         image: nginx:alpine
-        container_name: webserver_api
+        container_name: webserver_crud
         restart: unless-stopped
         tty: true
         ports:
@@ -37,7 +37,7 @@ services:
     #MySQL Service
     db:
         image: mysql:5.7.22
-        container_name: db_api
+        container_name: db_crud
         restart: unless-stopped
         tty: true
         ports:
