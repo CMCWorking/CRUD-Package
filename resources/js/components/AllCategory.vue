@@ -6,12 +6,14 @@
             <b-form-input v-model="keyword" placeholder="Search" type="text"></b-form-input>
         </b-input-group>
 
-        <b-table :fields="fields" :items="categories" :keyword="keyword" label-sort-asc="" label-sort-desc="">
+        <b-table id="my-table" :fields="fields" :items="categories" :keyword="keyword" label-sort-asc="" label-sort-desc="" :per-page="perPage" :current-page="currentPage">
             <template #cell(action)="data">
                 <router-link :to="{ name: 'edit', params: { id: data.item.id } }" class="btn btn-primary w-100">Edit</router-link>
                 <button class="btn btn-danger w-100" @click="showModal(data.item.id)">Delete</button>
             </template>
         </b-table>
+
+        <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" aria-controls="my-table"></b-pagination>
 
         <b-modal ref="my-modal" title="Delete this category" id="bv-modal-example" hide-footer>
             <template #modal-title>
@@ -25,9 +27,13 @@
 </template>
 
 <script>
+import { thisExpression } from '@babel/types';
+
 export default {
     data() {
         return {
+            perPage: 10,
+            currentPage: 1,
             keyword: "",
             dataArray: this.getCategories(),
             fields: [
@@ -76,6 +82,9 @@ export default {
                         item.description.includes(this.keyword)
                 )
                 : this.dataArray;
+        },
+        rows() {
+            return this.dataArray.length
         }
     }
 }
