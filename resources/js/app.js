@@ -16,6 +16,7 @@ import {
     routes
 } from './routes';
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
+import VuePaginateScroll from 'vue-paginate-scroll';
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -32,6 +33,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+Vue.component("VuePaginateScroll", VuePaginateScroll);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
