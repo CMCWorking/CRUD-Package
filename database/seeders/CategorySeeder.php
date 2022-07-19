@@ -24,7 +24,7 @@ class CategorySeeder extends Seeder
     {
         DB::table('categories')->truncate();
 
-        for ($i = 1; $i <= 20; $i++) {
+        for ($i = 1; $i <= 200; $i++) {
             $this->category->create([
                 'name' => $this->faker->sentence(3),
                 'description' => $this->faker->paragraph(2),
