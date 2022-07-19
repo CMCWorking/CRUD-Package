@@ -1,65 +1,92 @@
 <template>
     <div>
         <h2 class="text-center">Category List</h2>
+        <section class="categories">
+            <vue-paginate-scroll v-if="categories.length" :src="categories" :per-scroll="8">
+                <template slot-scope="{ data, currentScroll, lastScroll }">
+                    <div style="margin-top:5rem;" class="d-flex justify-content-center py-1 px-2 bg-success rounded-lg text-white fixed-bottom">
+                        <div>{{ data.length }} / {{ categories.length }} </div>
+                        <div class="ml-1">
+                            <strong>Current scoll:</strong>
+                            {{ currentScroll }}
+                        </div>
+                    </div>
 
-        <b-input-group class="mt-3 mb-3" size="sm">
-            <b-form-input v-model="keyword" placeholder="Search" type="text"></b-form-input>
-        </b-input-group>
+                    <div class="row">
+                        <div class="col-4 mb-2 d-flex" v-for="category in data" :key="category.id">
+                            <b-card class="shadow mb-3" :title="category.name">
+                                <b-card-text class="flex">{{ category.description }}</b-card-text>
 
-        <b-table id="my-table" :fields="fields" :items="categories" :keyword="keyword" label-sort-asc="" label-sort-desc="" :per-page="perPage" :current-page="currentPage">
-            <template #cell(action)="data">
-                <router-link :to="{ name: 'edit', params: { id: data.item.id } }" class="btn btn-primary w-100">Edit</router-link>
-                <button class="btn btn-danger w-100" @click="showModal(data.item.id)">Delete</button>
-            </template>
-        </b-table>
-
-        <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" aria-controls="my-table"></b-pagination>
-
-        <b-modal ref="my-modal" title="Delete this category" id="bv-modal-example" hide-footer>
-            <template #modal-title>
-                Are you sure to delete this Category?. <br>
-                This action can not undone
-            </template>
-            <b-button class="mt-2" variant="btn-primary" block @click="hideModal">Close</b-button>
-            <b-button class="mt-2" variant="outline-danger" block @click="deleteCategory(delete_id)">Confirm Delete</b-button>
-        </b-modal>
+                                <div class="btn-delete">
+                                    <router-link :to="{ name: 'edit', params: { id: category.id } }" class="btn btn-primary">Edit</router-link>
+                                    <button class="btn btn-outline-danger" @click="showModal(category.id)">Delete</button>
+                                </div>
+                            </b-card>
+                        </div>
+                    </div>
+                </template>
+            </vue-paginate-scroll>
+            <b-skeleton-wrapper :loading="loading">
+                <template #loading>
+                    <div class="row">
+                        <div class="col-4 mb-2">
+                            <b-card>
+                                <b-skeleton width="100%"></b-skeleton>
+                                <b-skeleton width="55%"></b-skeleton>
+                                <b-skeleton width="55%"></b-skeleton>
+                                <b-skeleton width="70%"></b-skeleton>
+                                <div class="btn-delete">
+                                    <b-skeleton width="35%"></b-skeleton>
+                                    <b-skeleton width="35%"></b-skeleton>
+                                </div>
+                            </b-card>
+                        </div>
+                    </div>
+                </template>
+            </b-skeleton-wrapper>
+        </section>
     </div>
 </template>
 
 <script>
-import { thisExpression } from '@babel/types';
-
 export default {
+    name: "App",
     data() {
         return {
-            perPage: 10,
-            currentPage: 1,
-            keyword: "",
-            dataArray: this.getCategories(),
-            fields: [
-                { key: "name", label: "Name", sortable: true },
-                { key: "description", label: "Description", sortable: false },
-                { key: "action", label: "", sortable: false }
-            ]
+            categories: [],
+            status: '',
+            offset: '',
+            limit: '',
+            loading: false,
         };
+    },
+    watch: {
+        loading(newValue, oldValue) {
+            if (newValue !== oldValue) {
+                this.clearLoadingTimeInterval()
+
+                if (newValue) {
+                    this.$_loadingTimeInterval = setInterval(() => {
+                        this.loadingTime++
+                    }, 1000)
+                }
+            }
+        },
+        loadingTime(newValue, oldValue) {
+            if (newValue !== oldValue) {
+                if (newValue === this.maxLoadingTime) {
+                    this.loading = false
+                }
+            }
+        }
     },
     methods: {
         getCategories() {
+            this.startLoading();
             axios.get("http://api.localhost/categories")
                 .then(response => {
-                    this.dataArray = response.data;
-                })
-                .catch(error => {
-                    console.log(error);
-                });
-        },
-        deleteCategory(id) {
-            // console.log(id);
-            axios.delete("http://api.localhost/categories/" + id)
-                .then(response => {
-                    let i = this.dataArray.map(data => data.id).indexOf(id);
-                    this.dataArray.splice(i, 1);
-                    this.hideModal();
+                    this.loading = false;
+                    this.categories = response.data;
                 })
                 .catch(error => {
                     console.log(error);
@@ -67,25 +94,44 @@ export default {
         },
         showModal(id) {
             this.delete_id = id;
-            this.$refs['my-modal'].show()
+            this.$refs['delete-modal'].show();
         },
         hideModal() {
-            this.$refs['my-modal'].hide()
+            this.$refs['delete-modal'].hide();
+        },
+        deleteCategory(id) {
+            console.log(id);
+        },
+        clearLoadingTimeInterval() {
+            clearInterval(this.$_loadingTimeInterval)
+            this.$_loadingTimeInterval = null
+        },
+        startLoading() {
+            this.loading = true
+            this.loadingTime = 0
         }
     },
-    computed: {
-        categories() {
-            return this.keyword
-                ? this.dataArray.filter(
-                    (item) =>
-                        item.name.includes(this.keyword) ||
-                        item.description.includes(this.keyword)
-                )
-                : this.dataArray;
-        },
-        rows() {
-            return this.dataArray.length
-        }
+    created() {
+        this.getCategories();
     }
-}
+};
 </script>
+
+<style>
+.categories {
+    padding: 1rem 0;
+}
+
+.card {
+    border: none;
+    border-left: 5px solid #099bc0;
+}
+
+.close {
+    visibility: hidden;
+}
+
+.btn-delete {
+    float: right;
+}
+</style>

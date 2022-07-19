@@ -9,10 +9,31 @@
             </div>
         </nav>
 
-        <router-view></router-view>
+        <router-view class="mx-2"></router-view>
+
+        <back-to-top></back-to-top>
     </div>
 </template>
 
 <script>
-export default {}
+import BackToTop from "./components/BackToTop";
+
+export default {
+    components: {
+        BackToTop
+    }
+}
 </script>
+
+<style>
+html {
+    scroll-behavior: smooth;
+}
+
+#app {
+    font-family: "Avenir", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #2c3e50;
+}
+</style>

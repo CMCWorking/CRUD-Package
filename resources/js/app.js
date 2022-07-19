@@ -16,10 +16,12 @@ import {
     routes
 } from './routes';
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
-import VuePaginateScroll from 'vue-paginate-scroll';
+import VuePaginateSrcoll from "vue-paginate-scroll";
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+
+import { CardPlugin, BButton } from "bootstrap-vue";
 
 /**
  * The following block of code may be used to automatically register your
@@ -33,7 +35,8 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-Vue.component("VuePaginateScroll", VuePaginateScroll);
+Vue.component("VuePaginateScroll", VuePaginateSrcoll);
+
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -45,6 +48,8 @@ Vue.use(VueRouter);
 Vue.use(VueAxios, axios);
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
+Vue.use(CardPlugin);
+Vue.component("BButton", BButton);
 
 const router = new VueRouter({
     mode: 'history',
