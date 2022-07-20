@@ -9,7 +9,7 @@
             </div>
         </nav>
 
-        <router-view class="mx-2"></router-view>
+        <router-view class="mx-4"></router-view>
 
         <back-to-top></back-to-top>
     </div>
@@ -28,6 +28,7 @@ export default {
 <style>
 html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
 }
 
 #app {

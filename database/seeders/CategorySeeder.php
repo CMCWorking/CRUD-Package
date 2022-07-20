@@ -13,6 +13,7 @@ class CategorySeeder extends Seeder
     {
         $this->category = $category;
         $this->faker = Factory::create();
+        $this->records = 30;
     }
 
     /**
@@ -24,7 +25,7 @@ class CategorySeeder extends Seeder
     {
         DB::table('categories')->truncate();
 
-        for ($i = 1; $i <= 200; $i++) {
+        for ($i = 1; $i <= $this->records; $i++) {
             $this->category->create([
                 'name' => $this->faker->sentence(3),
                 'description' => $this->faker->paragraph(2),

@@ -1,44 +1,52 @@
 <template>
     <div>
         <h2 class="text-center">Category List</h2>
+
         <section class="categories">
-            <vue-paginate-scroll v-if="categories.length" :src="categories" :per-scroll="8">
-                <template slot-scope="{ data, currentScroll, lastScroll }">
-                    <div style="margin-top:5rem;" class="d-flex justify-content-center py-1 px-2 bg-success rounded-lg text-white fixed-bottom">
-                        <div>{{ data.length }} / {{ categories.length }} </div>
-                        <div class="ml-1">
-                            <strong>Current scoll:</strong>
-                            {{ currentScroll }}
-                        </div>
-                    </div>
+            <div class="row">
+                <div class="col-4 mb-4 d-flex" v-if="categories.length" v-for="category in categories" :key="category.id">
+                    <b-card class="shadow w-100 h-100" header-tag="header" footer-tag="footer">
+                        <template #header>
+                            <h5 class="mb-0">{{ category.name }}</h5>
+                        </template>
 
-                    <div class="row">
-                        <div class="col-4 mb-2 d-flex" v-for="category in data" :key="category.id">
-                            <b-card class="shadow mb-3" :title="category.name">
-                                <b-card-text class="flex">{{ category.description }}</b-card-text>
+                        <b-card-text>
+                            {{ category.description }} <br>
+                            {{ category.description }} <br>
+                            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Accusamus, in! Laboriosam nesciunt et sint quaerat quam aliquid labore necessitatibus, quia praesentium aut corporis atque quibusdam facilis quisquam rerum! Doloribus, ut? <br>
+                            <br> <strong>ID: </strong>{{ category.id }}
+                        </b-card-text>
 
-                                <div class="btn-delete">
-                                    <router-link :to="{ name: 'edit', params: { id: category.id } }" class="btn btn-primary">Edit</router-link>
-                                    <button class="btn btn-outline-danger" @click="showModal(category.id)">Delete</button>
-                                </div>
-                            </b-card>
-                        </div>
-                    </div>
-                </template>
-            </vue-paginate-scroll>
+                        <template #footer>
+                            <router-link :to="{ name: 'edit', params: { id: category.id } }" class="btn btn-primary">Edit</router-link>
+
+                            <button class="btn btn-outline-danger btn-delete" @click="showModal(category.id)">Delete</button>
+                        </template>
+                    </b-card>
+                </div>
+
+                <div class="col-12 mb-4 text-center" v-if="maximumRecord == true">
+                    <b-card class="shadow w-100 h-100">
+                        <b-card-text>
+                            You have come to the end of categories
+                        </b-card-text>
+                    </b-card>
+                </div>
+            </div>
+
             <b-skeleton-wrapper :loading="loading">
                 <template #loading>
                     <div class="row">
-                        <div class="col-4 mb-2">
+                        <div class="col-4 mb-2" v-for="index in 3">
                             <b-card>
                                 <b-skeleton width="100%"></b-skeleton>
+
                                 <b-skeleton width="55%"></b-skeleton>
                                 <b-skeleton width="55%"></b-skeleton>
                                 <b-skeleton width="70%"></b-skeleton>
-                                <div class="btn-delete">
-                                    <b-skeleton width="35%"></b-skeleton>
-                                    <b-skeleton width="35%"></b-skeleton>
-                                </div>
+
+                                <b-skeleton width="20%"></b-skeleton>
+                                <b-skeleton width="20%"></b-skeleton>
                             </b-card>
                         </div>
                     </div>
@@ -49,8 +57,10 @@
 </template>
 
 <script>
+import DataService from '../services/DataService.js';
+const service = new DataService('categories');
+
 export default {
-    name: "App",
     data() {
         return {
             categories: [],
@@ -58,6 +68,8 @@ export default {
             offset: '',
             limit: '',
             loading: false,
+            total: 0,
+            maximumRecord: false
         };
     },
     watch: {
@@ -71,36 +83,48 @@ export default {
                     }, 1000)
                 }
             }
-        },
-        loadingTime(newValue, oldValue) {
-            if (newValue !== oldValue) {
-                if (newValue === this.maxLoadingTime) {
-                    this.loading = false
-                }
-            }
         }
     },
     methods: {
-        getCategories() {
-            this.startLoading();
-            axios.get("http://api.localhost/categories")
-                .then(response => {
-                    this.loading = false;
-                    this.categories = response.data;
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+        getInitialData() {
+            this.startLoading()
+            service.getAll().then(response => {
+                this.loading = false
+                this.categories = response.data.data
+                this.status = response.status
+                this.offset = response.data.offset
+                this.limit = response.data.limit
+                this.total = response.data.total
+            })
         },
-        showModal(id) {
-            this.delete_id = id;
-            this.$refs['delete-modal'].show();
-        },
-        hideModal() {
-            this.$refs['delete-modal'].hide();
-        },
-        deleteCategory(id) {
-            console.log(id);
+        scroll() {
+            window.onscroll = () => {
+                let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight === document.documentElement.offsetHeight
+
+                if (bottomOfWindow) {
+                    if (this.offset < this.total) {
+                        this.startLoading()
+                        service.getAll(this.offset, this.limit).then(response => {
+                            this.loading = false
+                            const append = response.data.data.slice(
+                                this.categories.length,
+                                this.categories.length + this.limit
+                            )
+                            this.categories = this.categories.concat(response.data.data)
+                            this.categories = [...new Set(this.categories)]
+                            this.status = response.status
+                            this.offset = response.data.offset
+                            this.limit = response.data.limit
+                            this.total = response.data.total
+                        }).catch(error => {
+                            this.loading = false
+                            console.log(error)
+                        });
+                    } else {
+                        this.maximumRecord = true
+                    }
+                }
+            }
         },
         clearLoadingTimeInterval() {
             clearInterval(this.$_loadingTimeInterval)
@@ -111,17 +135,16 @@ export default {
             this.loadingTime = 0
         }
     },
-    created() {
-        this.getCategories();
+    beforeMount() {
+        this.getInitialData();
+    },
+    mounted() {
+        this.scroll();
     }
 };
 </script>
 
 <style>
-.categories {
-    padding: 1rem 0;
-}
-
 .card {
     border: none;
     border-left: 5px solid #099bc0;

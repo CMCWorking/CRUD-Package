@@ -28,8 +28,18 @@ class CategoryV1Controller extends Controller
      */
     public function index(Request $request)
     {
-        $categories = $this->category->orderBy('created_at', 'desc')->filter($request->all())->get();
-        return response()->json($categories);
+        $offset = $request->header('offset');
+        $limit = $request->header('limit');
+
+        $total = $this->category->all()->count();
+        $categories = $this->category->offset($offset)->limit($limit)->filter($request->all())->get();
+
+        return response()->json([
+            'data' => $categories,
+            'total' => $total,
+            'offset' => $categories->max('id'),
+            'limit' => intval($limit),
+        ]);
     }
 
     /**
