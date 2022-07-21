@@ -4,7 +4,7 @@
 
         <section class="categories">
             <div class="row">
-                <div class="col-4 mb-4 d-flex" v-if="categories.length" v-for="category in categories" :key="category.id">
+                <div class="col-4 mb-4 d-flex" v-if="categories.length" v-for="category in categories">
                     <b-card class="shadow w-100 h-100" header-tag="header" footer-tag="footer">
                         <template #header>
                             <h5 class="mb-0">{{ category.name }}</h5>
@@ -32,12 +32,10 @@
                         </b-card-text>
                     </b-card>
                 </div>
-            </div>
 
-            <b-skeleton-wrapper :loading="loading">
-                <template #loading>
-                    <div class="row">
-                        <div class="col-4 mb-2" v-for="index in 3">
+                <b-skeleton-wrapper :loading="loading">
+                    <template #loading>
+                        <div class="col-4 mb-2">
                             <b-card>
                                 <b-skeleton width="100%"></b-skeleton>
 
@@ -49,9 +47,10 @@
                                 <b-skeleton width="20%"></b-skeleton>
                             </b-card>
                         </div>
-                    </div>
-                </template>
-            </b-skeleton-wrapper>
+                    </template>
+                </b-skeleton-wrapper>
+            </div>
+
         </section>
     </div>
 </template>
@@ -99,7 +98,7 @@ export default {
         },
         scroll() {
             window.onscroll = () => {
-                let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight === document.documentElement.offsetHeight
+                let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
 
                 if (bottomOfWindow) {
                     if (this.offset < this.total) {
@@ -111,7 +110,6 @@ export default {
                                 this.categories.length + this.limit
                             )
                             this.categories = this.categories.concat(response.data.data)
-                            this.categories = [...new Set(this.categories)]
                             this.status = response.status
                             this.offset = response.data.offset
                             this.limit = response.data.limit
